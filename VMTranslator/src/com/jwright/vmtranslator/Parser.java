@@ -37,6 +37,7 @@ public class Parser {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	public List<String> parseFile() {
 		index = 0;
 		
@@ -44,10 +45,14 @@ public class Parser {
 			// set current command to value in fileContents associated by index
 			currentCommand = fileContents.get(index);
 			String argType = arg1();
-			int argLocation;
+			String argSpec;
+			int argTarget;
 			
-			if (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL")
-				argLocation = arg2();
+			if (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL") {
+				argSpec = arg2();
+				argTarget = arg3();
+			}
+				
 			
 			index++;
 		}
@@ -59,8 +64,16 @@ public class Parser {
 		return index < fileContents.size();
 	}
 	
-	private String arg1() {
-		String opType = currentCommand.substring(0, currentCommand.indexOf(" "));
+	String arg1() {
+		// return operation type
+		String opType;
+		
+		if (currentCommand.indexOf(" ") == -1) {
+			opType = currentCommand;
+		}
+		else {
+			opType = currentCommand.substring(0, currentCommand.indexOf(" "));			
+		}
 		
 		switch (opType) {
 			case "add":
@@ -72,6 +85,12 @@ public class Parser {
 			case "lt":
 				return Operation.C_ARITHMETIC.toString();
 			case "gt":
+				return Operation.C_ARITHMETIC.toString();
+			case "and":
+				return Operation.C_ARITHMETIC.toString();
+			case "neg":
+				return Operation.C_ARITHMETIC.toString();
+			case "or":
 				return Operation.C_ARITHMETIC.toString();
 			case "push":
 				return Operation.C_PUSH.toString();
@@ -94,8 +113,24 @@ public class Parser {
 		}
 	}
 	
-	private int arg2() {
-		return Integer.parseInt(currentCommand.substring(currentCommand.indexOf(" ") + 1));
+	String arg2() {
+		// if present, return specifier for operation (ie. constant, temp, static, etc.)
+		// check for presence of second space character
+		// if present, return characters between spaces 1 and 2
+		// otherwise, return everything after first space
+		int firstSpace = currentCommand.indexOf(" ");
+		int secondSpace = currentCommand.indexOf(" ", firstSpace + 1);
+		
+		if (secondSpace == -1) {
+			return currentCommand.substring(firstSpace + 1);
+		}
+		
+		return currentCommand.substring(firstSpace + 1, secondSpace);
+	}
+	
+	int arg3() {
+		// if present, return target pointer for operation
+		return Integer.parseInt(currentCommand.substring(currentCommand.indexOf(" ", currentCommand.indexOf(" ")+1)+1));
 	}
 	
 	private void getLengthOfLongestLine() {
