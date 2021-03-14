@@ -11,8 +11,10 @@ public class Parser {
 	List<String> fileContents;
 	List<String> parsedContents;
 	String errorMessage;
-	int max, index;
+	int max, index, firstSpace, secondSpace;
 	String currentCommand;
+	String argType, argOp, argSpec;
+	int argTarget;
 	
 	private enum Operation {
 		C_ARITHMETIC,
@@ -44,9 +46,11 @@ public class Parser {
 		while (hasMoreCommands(index)) {
 			// set current command to value in fileContents associated by index
 			currentCommand = fileContents.get(index);
-			String argType = arg1();
-			String argSpec;
-			int argTarget;
+			argType = commandType();
+			
+			if (argType != "C_RETURN") {
+				argOp = arg1();
+			}
 			
 			if (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL") {
 				argSpec = arg2();
@@ -64,15 +68,16 @@ public class Parser {
 		return index < fileContents.size();
 	}
 	
-	String arg1() {
+	String commandType() {
 		// return operation type
 		String opType;
+		firstSpace = currentCommand.indexOf(" ");
 		
-		if (currentCommand.indexOf(" ") == -1) {
+		if (firstSpace == -1) {
 			opType = currentCommand;
 		}
 		else {
-			opType = currentCommand.substring(0, currentCommand.indexOf(" "));			
+			opType = currentCommand.substring(0, firstSpace);			
 		}
 		
 		switch (opType) {
@@ -109,17 +114,45 @@ public class Parser {
 			case "call":
 				return Operation.C_CALL.toString();
 		default:
+			return null;
+		}
+	}
+	
+	String arg1() {
+		switch (argType) {
+			case "C_ARITHMETIC":
+				return currentCommand;
+			case "C_PUSH":
+				return "push";
+			case "C_POP":
+				return "pop";
+			case "C_LABEL":
+				return "label";
+			case "C_GOTO":
+				return "goto";
+			case "C_IF":
+				return "if";
+			case "C_FUNCTION":
+				return "function";
+			case "C_CALL":
+				return "CALL";
+		default:
 			return "";
 		}
 	}
 	
 	String arg2() {
-		// if present, return specifier for operation (ie. constant, temp, static, etc.)
-		// check for presence of second space character
-		// if present, return characters between spaces 1 and 2
-		// otherwise, return everything after first space
-		int firstSpace = currentCommand.indexOf(" ");
-		int secondSpace = currentCommand.indexOf(" ", firstSpace + 1);
+		/* if present, return specifier for operation (ie. constant, temp, static, etc.)
+		if first space not present, return null case
+		check for presence of second space character
+		if present, return characters between spaces 1 and 2
+		otherwise, return everything after first space */
+		firstSpace = currentCommand.indexOf(" ");
+		secondSpace = currentCommand.indexOf(" ", firstSpace + 1);
+		
+		if (firstSpace == -1) {
+			return null;
+		}
 		
 		if (secondSpace == -1) {
 			return currentCommand.substring(firstSpace + 1);
@@ -130,7 +163,18 @@ public class Parser {
 	
 	int arg3() {
 		// if present, return target pointer for operation
-		return Integer.parseInt(currentCommand.substring(currentCommand.indexOf(" ", currentCommand.indexOf(" ")+1)+1));
+		firstSpace = currentCommand.indexOf(" ");
+		secondSpace = currentCommand.indexOf(" ", firstSpace + 1);
+		
+		if (firstSpace == -1) {
+			return -1;
+		}
+		
+		if (secondSpace == -1) {
+			return -1;
+		}
+		
+		return Integer.parseInt(currentCommand.substring(secondSpace + 1));
 	}
 	
 	private void getLengthOfLongestLine() {
