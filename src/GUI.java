@@ -1,5 +1,3 @@
-package com.jwright.vmtranslator;
-
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -15,16 +13,14 @@ import javax.swing.JTextArea;
 
 @SuppressWarnings("serial")
 public class GUI extends JPanel implements ActionListener {
-	private JFrame frame;
-	private JPanel buttonPanel;
-	private JTextArea logI, logO;
-	private JScrollPane logScrollPaneI, logScrollPaneO;
-	private JButton openButton, saveButton, parseButton;
-	private JFileChooser fc;
-	private File activeDirectory;
-	
-	Parser fileParser;
-	
+	JFrame frame;
+	JPanel buttonPanel;
+	JTextArea logI, logO;
+	JScrollPane logScrollPaneI, logScrollPaneO;
+	JButton openButton, saveButton, parseButton;
+	JFileChooser fc;
+	File activeDirectory;
+		
 	public GUI() {
 		super(new BorderLayout());
 		
@@ -55,13 +51,8 @@ public class GUI extends JPanel implements ActionListener {
 		fc.setCurrentDirectory(activeDirectory);
 		
 		openButton = new JButton("Load file...");
-		openButton.addActionListener(this);
-		
 		saveButton = new JButton("Save file...");
-		saveButton.addActionListener(this);
-		
 		parseButton = new JButton("Parse");
-		parseButton.addActionListener(this);
 		
 		buttonPanel.add(openButton);
 		buttonPanel.add(parseButton);
@@ -75,7 +66,7 @@ public class GUI extends JPanel implements ActionListener {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// handle action from open button
@@ -88,12 +79,13 @@ public class GUI extends JPanel implements ActionListener {
 				// if a file selected, attempt to parse
 				File file = fc.getSelectedFile();
 				
-				fileParser = new Parser(file);
+				VMTranslator.createParser(file);
+
 				logI.append("Opening" + " " + file.getName() + "\n");			
 
 				// if file was opened successfully, append each line to display in input log pane
-				if (fileParser.errorMessage == null) {
-					for (String line : fileParser.fileContents) {
+				if (VMTranslator.fileParser.errorMessage == null) {
+					for (String line : VMTranslator.fileParser.fileContents) {
 						logI.append(line + "\n");
 					}
 				}							
@@ -106,7 +98,7 @@ public class GUI extends JPanel implements ActionListener {
 		if (e.getSource() == parseButton) {
 			logO.setText("");
 			
-			fileParser.parseFile();
+			VMTranslator.fileParser.parseFile();
 		}
 	}
 }
