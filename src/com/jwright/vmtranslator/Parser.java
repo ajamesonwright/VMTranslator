@@ -40,6 +40,7 @@ public class Parser {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	public List<String> parseFile() {
 		index = 0;
 		String line;
@@ -59,13 +60,11 @@ public class Parser {
 					argOp = arg1();
 				}
 				
-				if (arg2Applicable()) {
+				if (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL") {
 					argSpec = arg2();
 					argTarget = arg3();
 				}
 				
-				
-
 				switch (argSpec) {
 					case "local":
 						addrInt = 1 + argTarget;
@@ -119,7 +118,7 @@ public class Parser {
 		argSpec = "";
 		argTarget = -1;
 		addrInt = 0;
-		addrStr = "";
+		addrStr 
 	}
 	
 	String trimString() {
@@ -228,10 +227,6 @@ public class Parser {
 		return currentCommand.substring(firstSpace + 1, secondSpace);
 	}
 	
-	boolean arg2Applicable() {
-		return (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL");
-	}
-
 	int arg3() {
 		// if present, return target pointer for operation
 		firstSpace = currentCommand.indexOf(" ");
