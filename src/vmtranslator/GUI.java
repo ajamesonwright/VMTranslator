@@ -1,3 +1,5 @@
+package vmtranslator;
+
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -27,7 +29,7 @@ public class GUI extends JPanel implements ActionListener {
 		// main window for user interaction
 		frame = new JFrame();
 		frame.setSize(400,400);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
 		// set title for main window
 		frame.setTitle("VM Translator");

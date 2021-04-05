@@ -1,3 +1,5 @@
+package vmtranslator;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +43,7 @@ public class Parser {
 	public List<String> parseFile() {
 		index = 0;
 		String line;
-		parsedContents = new ArrayList<String>();
+		parsedContents = new ArrayList<>();
 		
 		while (hasMoreCommands(index)) {
 			// set current command to value in fileContents associated by index
@@ -68,7 +70,6 @@ public class Parser {
 					case "local":
 						addrInt = 1 + argTarget;
 						addrStr = Integer.toString(addrInt);
-						
 					case "argument":
 						
 					case "this":
@@ -112,7 +113,7 @@ public class Parser {
 		return parsedContents;
 	}
 	
-	void initialize() {
+	private void initialize() {
 		argOp = "";
 		argSpec = "";
 		argTarget = -1;
@@ -120,9 +121,21 @@ public class Parser {
 		addrStr = "";
 	}
 	
-	String trimString() {
-		// for the simplicity of the .VM files in question, simple character matching will be used instead of regex
-		if (currentCommand.charAt(0)== '/' || currentCommand.charAt(0) == ' ') {
+	public String trimString() {
+		// detect and remove lines containing only comments as well as trailing comments
+		int commentIndex = currentCommand.indexOf("/");
+
+		// detect and remove lines containing only comments
+		if (commentIndex == 0) {
+			return "";
+		}
+		// detect and remove lines containing trailing comments
+		else if (commentIndex > 0) {
+			return currentCommand.substring(0, commentIndex).trim();
+		}
+
+		// remove empty lines
+		if (currentCommand.charAt(0) == ' ') {
 			return "";
 		}
 		return currentCommand.trim();
@@ -132,7 +145,7 @@ public class Parser {
 		return index < fileContents.size();
 	}
 	
-	String commandType() {
+	public String commandType() {
 		// return operation type
 		String opType;
 		firstSpace = currentCommand.indexOf(" ");
@@ -182,7 +195,7 @@ public class Parser {
 		}
 	}
 	
-	String arg1() {
+	public String arg1() {
 		// return operation type in plain text
 		switch (argType) {
 			case "C_ARITHMETIC":
@@ -206,7 +219,7 @@ public class Parser {
 		}
 	}
 	
-	String arg2() {
+	public String arg2() {
 		/* if present, return specifier for operation (ie. constant, temp, static, etc.)
 		if first space not present, return null case
 		check for presence of second space character
@@ -226,11 +239,11 @@ public class Parser {
 		return currentCommand.substring(firstSpace + 1, secondSpace);
 	}
 	
-	boolean arg2Applicable() {
+	private boolean arg2Applicable() {
 		return (argType == "C_PUSH" || argType == "C_POP" || argType == "C_FUNCTION" || argType == "C_CALL");
 	}
 
-	int arg3() {
+	public int arg3() {
 		// if present, return target pointer for operation
 		firstSpace = currentCommand.indexOf(" ");
 		secondSpace = currentCommand.indexOf(" ", firstSpace + 1);
@@ -253,5 +266,17 @@ public class Parser {
 				max = line.length();
 			}
 		}
+	}
+
+	public List<String> getFileContents() { 
+		return this.fileContents;
+	}
+
+	public void setCurrentCommand(String command) {
+		currentCommand = command;
+	}
+
+	public String getCurrentCommand() {
+		return currentCommand;
 	}
 }
