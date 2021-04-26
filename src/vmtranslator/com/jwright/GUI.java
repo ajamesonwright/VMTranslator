@@ -1,4 +1,4 @@
-package vmtranslator;
+package com.jwright;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -22,6 +22,7 @@ public class GUI extends JPanel implements ActionListener {
 	JButton openButton, saveButton, parseButton;
 	JFileChooser fc;
 	File activeDirectory;
+	File file;
 		
 	public GUI() {
 		super(new BorderLayout());
@@ -49,12 +50,15 @@ public class GUI extends JPanel implements ActionListener {
 		logScrollPaneO = new JScrollPane(logO);
 
 		fc = new JFileChooser();
-		activeDirectory = new File("C:/Users/Jameson/Nand to Tetris/nand2tetris/projects/07");
+		activeDirectory = new File("C:/Users/Jamie/git/VMTranslator/src/vmtranslator/com/jwright/");
 		fc.setCurrentDirectory(activeDirectory);
 		
 		openButton = new JButton("Load file...");
+		openButton.addActionListener(this);
 		saveButton = new JButton("Save file...");
+		saveButton.addActionListener(this);
 		parseButton = new JButton("Parse");
+		parseButton.addActionListener(this);
 		
 		buttonPanel.add(openButton);
 		buttonPanel.add(parseButton);
@@ -79,18 +83,10 @@ public class GUI extends JPanel implements ActionListener {
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// if a file selected, attempt to parse
-				File file = fc.getSelectedFile();
+				file = fc.getSelectedFile();
 				
-				VMTranslator.createParser(file);
-
-				logI.append("Opening" + " " + file.getName() + "\n");			
-
-				// if file was opened successfully, append each line to display in input log pane
-				if (VMTranslator.fileParser.errorMessage == null) {
-					for (String line : VMTranslator.fileParser.fileContents) {
-						logI.append(line + "\n");
-					}
-				}							
+				logI.append("Opening" + " " + file.getName() + "\n\n");			
+				VMTranslator.openFile(file);					
 			}
 			// if cancelled, append message to scroll pane
 			else {
@@ -99,8 +95,18 @@ public class GUI extends JPanel implements ActionListener {
 		}
 		if (e.getSource() == parseButton) {
 			logO.setText("");
-			
-			VMTranslator.fileParser.parseFile();
+
+			// check logI for contents, parse file if found
+			if (logI.getText().trim().length() > 0) {
+				logO.append("Parsing" + " " + file.getName() + "...\n\n");
+				VMTranslator.triggerParser();
+			}
+		}
+		if (e.getSource() == saveButton) {
+			// if file has been parsed, write logO contents to file
+			if (logO.getText().trim().length() > 0) {
+				VMTranslator.triggerCodeWriter(file);
+			}			
 		}
 	}
 }
