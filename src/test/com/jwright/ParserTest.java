@@ -3,7 +3,6 @@ package com.jwright;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,19 +10,7 @@ class ParserTest {
 	
 	File testFile = new File("C:\\Users\\Jamie\\git\\VMTranslator\\src\\vmtranslator\\SimpleAdd.vm");
 	Parser testObject = new Parser(testFile);
-	
-	@Test
-	void testParser() {
 		
-
-		/*
-		List<String> fileContents = testObject.getFileContents();
-
-		assertEquals("// Pushes and adds two constants.", fileContents.get(0));
-		assertEquals("add", fileContents.get(fileContents.size()-1));
-		*/
-	}
-	
 	@Test
 	void testCommandType() {
 		testObject.currentCommand = "push constant 1";
