@@ -1,4 +1,4 @@
-package test;
+package com.jwright;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import vmtranslator.*;
-
 class ParserTest {
 	
 	File testFile = new File("C:\\Users\\Jamie\\git\\VMTranslator\\src\\vmtranslator\\SimpleAdd.vm");
@@ -16,68 +14,65 @@ class ParserTest {
 	
 	@Test
 	void testParser() {
+		
+
+		/*
 		List<String> fileContents = testObject.getFileContents();
 
 		assertEquals("// Pushes and adds two constants.", fileContents.get(0));
 		assertEquals("add", fileContents.get(fileContents.size()-1));
-	}
-
-	@Test
-	void testParseFile() {
-		List<String> parsedContents = testObject.parseFile();
-
-		assertEquals("pushconstant", parsedContents.get(0));
-		assertEquals("add", parsedContents.get(2));
+		*/
 	}
 	
 	@Test
 	void testCommandType() {
-		testObject.setCurrentCommand("push constant 1");
+		testObject.currentCommand = "push constant 1";
 		assertEquals("C_PUSH", testObject.commandType());
 		
-		testObject.setCurrentCommand("lt");
+		testObject.currentCommand = "lt";
 		assertEquals("C_ARITHMETIC", testObject.commandType());
 		
-		testObject.setCurrentCommand("test");
+		testObject.currentCommand = "test";
 		assertEquals("", testObject.commandType());
 	}
 	
 	@Test
 	void testArg2() {
-		testObject.setCurrentCommand("push constant 1");
+		testObject.currentCommand = "push constant 1";
 		assertEquals("constant", testObject.arg2());
 		
-		testObject.setCurrentCommand("test case");
+		testObject.currentCommand = "test case";
 		assertEquals("case", testObject.arg2());
 		
-		testObject.setCurrentCommand("testcase");
+		testObject.currentCommand = "testcase";
 		assertEquals("", testObject.arg2());
 	}
 	
 	@Test
 	void testArg3() {
-		testObject.setCurrentCommand("push constant 1");
+		testObject.currentCommand = "push constant 1";
 		assertEquals(1, testObject.arg3());
 		
-		testObject.setCurrentCommand("push constant 11");
+		testObject.currentCommand = "push constant 11";
 		assertEquals(11, testObject.arg3());
 		
-		testObject.setCurrentCommand("test case2");
+		testObject.currentCommand = "test case2";
 		assertEquals(-1, testObject.arg3());
 		
-		testObject.setCurrentCommand("testcase2");
+		testObject.currentCommand = "testcase2";
 		assertEquals(-1, testObject.arg3());
 	}
 
 	@Test
-	void testTrim() {
-		testObject.setCurrentCommand("// test whole line comment");
+	void testTrimString() {
+		testObject.currentCommand = "// test CommentOnlyLine";
 		assertEquals("", testObject.trimString());
 
-		testObject.setCurrentCommand("test // trailing comment");
-		assertEquals("test", testObject.trimString());
+		testObject.currentCommand = "TrailingComment // test";
+		assertEquals("TrailingComment", testObject.trimString());
 
-		testObject.setCurrentCommand(" test blank line ");
-		assertEquals("", testObject.trimString());
+		testObject.currentCommand = " test leading whitespace";
+		assertEquals("test leading whitespace", testObject.trimString());
 	}
+
 }
