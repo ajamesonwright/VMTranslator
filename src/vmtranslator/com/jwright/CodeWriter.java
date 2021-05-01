@@ -31,29 +31,27 @@ public class CodeWriter {
 
     String writeArithmetic(String[] arithmeticCommand) throws IOException {
         // needs to translate each VM command into component assembly commands
-        String writeCommand = "";
+        String writeCommand = "// " + arithmeticCommand[0] + "\n";
         if (arithmeticCommand[0].equals("add")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
-            M=M+D
-            """;
+            M=M+D""";
         }
         else if (arithmeticCommand[0].equals("sub")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
-            M=M-D
-            """;
+            M=M-D""";
         }
         else if (arithmeticCommand[0].equals("eq")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
             D=M-D
@@ -71,9 +69,9 @@ public class CodeWriter {
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("lt")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
             D=M-D
@@ -91,9 +89,9 @@ public class CodeWriter {
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("gt")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
             D=M-D
@@ -111,37 +109,33 @@ public class CodeWriter {
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("and")) {
-            writeCommand = """
+            writeCommand += """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
-            M=M&D
-            """;
+            M=M&D""";
         }
         else if (arithmeticCommand[0].equals("neg")) {
-            writeCommand = """
+            writeCommand += """
             @SP
             A=M-1
             D=0
-            M=D-M
-            """;
+            M=D-M""";
         }
         else if (arithmeticCommand[0].equals("not")) {
-            writeCommand = """
+            writeCommand +=  """
             @SP
             A=M-1
-            M=!M
-            """;
+            M=!M""";
         }
         else if (arithmeticCommand[0].equals("or")) {
-            writeCommand = """
+            writeCommand +=  """
             @SP
-            A=M-1
+            AM=M-1
             D=M
             A=A-1
-            M=M|D
-            """;
+            M=M|D""";
         }
         fw.write(writeCommand + "\n");
 
@@ -149,13 +143,14 @@ public class CodeWriter {
     }
 
     String writePushPop(String[] pushPopCommand) throws IOException {
-        String writeCommand = "";
+        // comment line being translated
+        String writeCommand = "// " + pushPopCommand[0] + " " + pushPopCommand[1] + " " + pushPopCommand[2] + "\n";
         int target = Integer.parseInt(pushPopCommand[2]);
 
         // needs to translate each VM command into component assembly commands
         if (pushPopCommand[0].equals("push")) {
             if (pushPopCommand[1].equals("local")) {
-                writeCommand = """
+                writeCommand += """
                 @LCL
                 D=M
                 @""" + target + "\n" + """
@@ -169,7 +164,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("argument")){
-                writeCommand = """
+                writeCommand += """
                 @ARG
                 D=M
                 @""" + target + "\n" + """
@@ -183,7 +178,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("this")) {
-                writeCommand = """
+                writeCommand += """
                 @THIS
                 D=M
                 @""" + target + "\n" + """
@@ -197,7 +192,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("that")) {
-                writeCommand = """
+                writeCommand += """
                 @THAT
                 D=M
                 @""" + target + "\n" + """
@@ -211,7 +206,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("constant")) {
-                writeCommand = "@" + target + "\n" + """
+                writeCommand += "@" + target + "\n" + """
                 D=A
                 @SP
                 A=M
@@ -222,7 +217,7 @@ public class CodeWriter {
             }
             else if (pushPopCommand[1].equals("static")) {
                 int addr = 16 + target;
-                writeCommand = "@" + addr + "\n" + """
+                writeCommand += "@" + addr + "\n" + """
                 D=M
                 @SP
                 A=M
@@ -232,10 +227,11 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("temp")) {
-                writeCommand = """
+                int addr = 5 + target;
+                writeCommand += """
                 @R5
                 D=M
-                @""" + target + "\n" + """
+                @""" + addr + "\n" + """
                 A=D+A
                 D=M
                 @SP
@@ -255,7 +251,7 @@ public class CodeWriter {
                 else {
                     throw new IllegalArgumentException("Illegal pointer argument");
                 }
-                writeCommand = writeCommand + """
+                writeCommand += """
                 D=M
                 @SP
                 A=M
@@ -270,7 +266,7 @@ public class CodeWriter {
         }
         else if (pushPopCommand[0].equals("pop")) {
             if (pushPopCommand[1].equals("local")) {
-                writeCommand = """
+                writeCommand += """
                 @LCL
                 D=M
                 @""" + target + "\n" +  """
@@ -278,7 +274,7 @@ public class CodeWriter {
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -286,7 +282,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("argument")){
-                writeCommand = """
+                writeCommand += """
                 @ARG
                 D=M
                 @""" + target + "\n" + """
@@ -294,7 +290,7 @@ public class CodeWriter {
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -302,7 +298,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("this")) {
-                writeCommand = """
+                writeCommand += """
                 @THIS
                 D=M
                 @""" + target + "\n" + """
@@ -310,7 +306,7 @@ public class CodeWriter {
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -318,7 +314,7 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("that")) {
-                writeCommand = """
+                writeCommand += """
                 @THAT
                 D=M
                 @""" + target + "\n" + """
@@ -326,7 +322,7 @@ public class CodeWriter {
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -338,12 +334,12 @@ public class CodeWriter {
             }
             else if (pushPopCommand[1].equals("static")) {
                 int addr = 16 + target;
-                writeCommand = "@" + addr + "\n" + """
+                writeCommand += "@" + addr + "\n" + """
                 D=A
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -351,15 +347,16 @@ public class CodeWriter {
                 """;
             }
             else if (pushPopCommand[1].equals("temp")) {
-                writeCommand = """
+                int addr = 5 + target;
+                writeCommand += """
                 @R5
                 D=M
-                @""" + target + "\n" +  """
+                @""" + addr + "\n" +  """
                 D=D+A
                 @R13
                 M=D
                 @SP
-                A=M-1
+                AM=M-1
                 D=M
                 @R13
                 A=M
@@ -368,20 +365,20 @@ public class CodeWriter {
             }
             else if (pushPopCommand[1].equals("pointer")) {
                 if (target == 0) {
-                    writeCommand = "@THIS";
+                    writeCommand += "@THIS";
                 }
                 else if (target == 1) {
-                    writeCommand = "@THAT";
+                    writeCommand += "@THAT";
                 }
                 else {
                     throw new IllegalArgumentException("Illegal pointer argument");
                 }
-                writeCommand = writeCommand + """
+                writeCommand += """
                 D=A
                 @R13
                 M=D
                 @SP
-                A=M=1
+                AM=M=1
                 D=M
                 @R13
                 A=M

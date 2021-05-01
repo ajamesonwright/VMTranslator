@@ -50,7 +50,7 @@ public class GUI extends JPanel implements ActionListener {
 		logScrollPaneO = new JScrollPane(logO);
 
 		fc = new JFileChooser();
-		activeDirectory = new File("C:/Users/Jamie/git/VMTranslator/src/vmtranslator/com/jwright/");
+		activeDirectory = new File("C:\\Users\\Jameson\\Nand To Tetris\\nand2tetris\\projects\\07");
 		fc.setCurrentDirectory(activeDirectory);
 		
 		openButton = new JButton("Load file...");
