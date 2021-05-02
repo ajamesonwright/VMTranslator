@@ -93,6 +93,8 @@ public class Parser {
 				return Operation.C_ARITHMETIC.toString();
 			case "neg":
 				return Operation.C_ARITHMETIC.toString();
+			case "not":
+				return Operation.C_ARITHMETIC.toString();
 			case "or":
 				return Operation.C_ARITHMETIC.toString();
 			case "push":

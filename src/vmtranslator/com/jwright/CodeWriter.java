@@ -38,7 +38,8 @@ public class CodeWriter {
             AM=M-1
             D=M
             A=A-1
-            M=M+D""";
+            M=M+D
+            """;
         }
         else if (arithmeticCommand[0].equals("sub")) {
             writeCommand += """
@@ -46,66 +47,67 @@ public class CodeWriter {
             AM=M-1
             D=M
             A=A-1
-            M=M-D""";
+            M=M-D
+            """;
         }
         else if (arithmeticCommand[0].equals("eq")) {
-            writeCommand += """
-            @SP
-            AM=M-1
-            D=M
-            A=A-1
-            D=M-D
-            @FALSE""" + lineJump + "\nD; JNE" + """
-            @SP
-            A=M-1
-            M=-1
-            @CONTINUE""" + lineJump + "\n0;JMP";
-            writeCommand += "(FALSE" + lineJump + ")";
-            writeCommand += """
-            @SP
-            A=M-1
-            M=0""";
-            writeCommand += "(CONTINUE" + lineJump + ")";
+            writeCommand += "@SP\n" +
+            "AM=M-1\n" + 
+            "D=M\n" + 
+            "A=A-1\n" + 
+            "D=M-D\n" + 
+            "@FALSE" + lineJump + "\n" + 
+            "D;JNE\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=-1\n" + 
+            "@CONTINUE" + lineJump + "\n" + 
+            "0;JMP\n" + 
+            "(FALSE" + lineJump + ")\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=0\n" + 
+            "(CONTINUE" + lineJump + ")\n";
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("lt")) {
-            writeCommand += """
-            @SP
-            AM=M-1
-            D=M
-            A=A-1
-            D=M-D
-            @FALSE""" + lineJump + "\nD; JGE" + """
-            @SP
-            A=M-1
-            M=-1
-            @CONTINUE""" + lineJump + "\n0;JMP";
-            writeCommand += "(FALSE" + lineJump + ")";
-            writeCommand += """
-            @SP
-            A=M-1
-            M=0""";
-            writeCommand += "(CONTINUE" + lineJump + ")";
+            writeCommand += "@SP\n" +
+            "AM=M-1\n" + 
+            "D=M\n" + 
+            "A=A-1\n" + 
+            "D=M-D\n" + 
+            "@FALSE" + lineJump + "\n" + 
+            "D;JGE\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=-1\n" + 
+            "@CONTINUE" + lineJump + "\n" + 
+            "0;JMP\n" + 
+            "(FALSE" + lineJump + ")\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=0\n" + 
+            "(CONTINUE" + lineJump + ")\n";
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("gt")) {
-            writeCommand += """
-            @SP
-            AM=M-1
-            D=M
-            A=A-1
-            D=M-D
-            @FALSE""" + lineJump + "\nD; JLE" + """
-            @SP
-            A=M-1
-            M=-1
-            @CONTINUE""" + lineJump + "\n0;JMP";
-            writeCommand += "(FALSE" + lineJump + ")";
-            writeCommand += """
-            @SP
-            A=M-1
-            M=0""";
-            writeCommand += "(CONTINUE" + lineJump + ")";
+            writeCommand += "@SP\n" +
+            "AM=M-1\n" + 
+            "D=M\n" + 
+            "A=A-1\n" + 
+            "D=M-D\n" + 
+            "@FALSE" + lineJump + "\n" + 
+            "D;JLE\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=-1\n" + 
+            "@CONTINUE" + lineJump + "\n" + 
+            "0;JMP\n" + 
+            "(FALSE" + lineJump + ")\n" + 
+            "@SP\n" + 
+            "A=M-1\n" + 
+            "M=0\n" + 
+            "(CONTINUE" + lineJump + ")\n";
             lineJump++;
         }
         else if (arithmeticCommand[0].equals("and")) {
@@ -114,20 +116,23 @@ public class CodeWriter {
             AM=M-1
             D=M
             A=A-1
-            M=M&D""";
+            M=M&D
+            """;
         }
         else if (arithmeticCommand[0].equals("neg")) {
             writeCommand += """
             @SP
             A=M-1
             D=0
-            M=D-M""";
+            M=D-M
+            """;
         }
         else if (arithmeticCommand[0].equals("not")) {
             writeCommand +=  """
             @SP
             A=M-1
-            M=!M""";
+            M=!M
+            """;
         }
         else if (arithmeticCommand[0].equals("or")) {
             writeCommand +=  """
@@ -135,9 +140,10 @@ public class CodeWriter {
             AM=M-1
             D=M
             A=A-1
-            M=M|D""";
+            M=M|D
+            """;
         }
-        fw.write(writeCommand + "\n");
+        fw.write(writeCommand);
 
         return writeCommand;
     }
@@ -243,10 +249,10 @@ public class CodeWriter {
             }
             else if (pushPopCommand[1].equals("pointer")) {
                 if (target == 0) {
-                    writeCommand = "@THIS";
+                    writeCommand = "@THIS\n";
                 }
                 else if (target == 1) {
-                    writeCommand = "@THAT";
+                    writeCommand = "@THAT\n";
                 }
                 else {
                     throw new IllegalArgumentException("Illegal pointer argument");
@@ -365,10 +371,10 @@ public class CodeWriter {
             }
             else if (pushPopCommand[1].equals("pointer")) {
                 if (target == 0) {
-                    writeCommand += "@THIS";
+                    writeCommand += "@THIS\n";
                 }
                 else if (target == 1) {
-                    writeCommand += "@THAT";
+                    writeCommand += "@THAT\n";
                 }
                 else {
                     throw new IllegalArgumentException("Illegal pointer argument");

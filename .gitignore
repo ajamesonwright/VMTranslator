@@ -3,3 +3,7 @@
 *.ini
 /project resources/*
 *.log
+*.vm
+*.asm
+*.vscode
+*.gitignore
