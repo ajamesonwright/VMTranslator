@@ -3,6 +3,7 @@ package com.jwright;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -80,36 +81,38 @@ public class VMTranslator {
 		gui.logO.append("Parsing complete");
 	}
 
-	public static void triggerCodeWriter(File fileIn) {
-		// extract destination file name
-		String fileInName = fileIn.getPath();
-		// exchange .vm extension for .asm extension
-		String fileOutName = fileInName.substring(0, fileInName.indexOf(".")) + ".asm";
-		
-		try {
-			// create new file for parsed output
-			File outputFile = new File(fileOutName);
-			outputFile.createNewFile();
-			codeWriter.fw = new FileWriter(outputFile);
-
-			String writerOutput = "";
-			gui.logO.setText("");
-			// step through all arrays stored in parsed list
-			for (String[] sa : codeWriter.outputQueue) {
-				// save arithmetic commands
-				if (sa.length == 1) {
-					writerOutput = codeWriter.writeArithmetic(sa);
+	public static void triggerCodeWriter(List<File> fileIn) {
+		for (File f : fileIn) {
+			// extract destination file name
+			String fileInName = f.getPath();
+			// exchange .vm extension for .asm extension
+			String fileOutName = fileInName.substring(0, fileInName.indexOf(".")) + ".asm";
+			
+			try {
+				// create new file for parsed output
+				File outputFile = new File(fileOutName);
+				outputFile.createNewFile();
+				codeWriter.fw = new FileWriter(outputFile);
+	
+				String writerOutput = "";
+				gui.logO.setText("");
+				// step through all arrays stored in parsed list
+				for (String[] sa : codeWriter.outputQueue) {
+					// save arithmetic commands
+					if (sa.length == 1) {
+						writerOutput = codeWriter.writeArithmetic(sa);
+					}
+					// save push/pop commands
+					if (sa.length == 3) {
+						writerOutput = codeWriter.writePushPop(sa);
+					}
+					gui.logO.append(writerOutput);
 				}
-				// save push/pop commands
-				if (sa.length == 3) {
-					writerOutput = codeWriter.writePushPop(sa);
-				}
-				gui.logO.append(writerOutput);
+				codeWriter.closeFileWriter();
 			}
-			codeWriter.closeFileWriter();
-		}
-		catch (IOException e) {
-			System.out.println(e.toString());
+			catch (IOException e) {
+				System.out.println(e.toString());
+			}
 		}
 		
 	}
