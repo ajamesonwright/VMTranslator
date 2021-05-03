@@ -21,7 +21,7 @@ public class VMTranslator {
 		});
 	}
 
-	public static void openFile(File file) {
+	static void openFile(File file) {
 		// create parser, open file, and store file contents
 		parser = new Parser(file);
 
@@ -35,7 +35,7 @@ public class VMTranslator {
 		parser = new Parser(file);
 	}
 
-	public static void triggerParser() {
+	static void triggerParser() {
 		String argType, argument1, argument2;
 		int argument3;
 
@@ -76,12 +76,15 @@ public class VMTranslator {
 			if (argType == "C_PUSH" || argType == "C_POP") {
 				codeWriter.storePushPop(argument1, argument2, argument3);
 			}
+			if (argType == "C_LABEL") {
+				codeWriter.storeLabel(argument1, argument2);
+			}
 
 		}
 		gui.logO.append("Parsing complete");
 	}
 
-	public static void triggerCodeWriter(List<File> fileIn) {
+	static void triggerCodeWriter(List<File> fileIn) {
 		for (File f : fileIn) {
 			// extract destination file name
 			String fileInName = f.getPath();
@@ -115,5 +118,9 @@ public class VMTranslator {
 			}
 		}
 		
+	}
+
+	static void triggerFileChange(String fileName) {
+		codeWriter.setFileName(fileName);
 	}
 }

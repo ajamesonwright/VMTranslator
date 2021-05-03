@@ -14,6 +14,14 @@ public class CodeWriter {
         outputQueue = new ArrayList<>();
         lineJump = 0;
     }
+    
+    void setFileName(String fileName) {
+        
+    }
+    
+    void writeInit() {
+
+    }
 
     void storeArithmetic(String currentCommand) {
         String[] newArithmetic = new String[1];
@@ -27,6 +35,42 @@ public class CodeWriter {
         newPushPop[1] = arg2;
         newPushPop[2] = "" + arg3;
         outputQueue.add(newPushPop);
+    }
+
+    void storeLabel(String arg1, String arg2) {
+        String[] newLabel = new String[2];
+        newLabel[0] = arg1;
+        newLabel[1] = arg2;
+    }
+    
+    void storeGoTo(String arg1, String arg2) {
+        String[] newGoTo = new String[2];
+        newGoTo[0] = arg1;
+        newGoTo[1] = arg2;
+    }
+
+    void storeIf(String arg1, String arg2) {
+        String[] newIf = new String[2];
+        newIf[0] = arg1;
+        newIf[1] = arg2;
+    }
+
+    void storeFunction(String arg1, String arg2, String arg3) {
+        String[] newFunction = new String[3];
+        newFunction[0] = arg1;
+        newFunction[1] = arg2;
+        newFunction[2] = arg3;
+    }
+
+    void storeCall(String arg1, String arg2, String arg3) {
+        String[] newCall = new String[3];
+        newCall[0] = arg1;
+        newCall[1] = arg2;
+        newCall[2] = arg3;
+    }
+
+    void storeReturn() {
+
     }
 
     String writeArithmetic(String[] arithmeticCommand) throws IOException {
@@ -395,6 +439,54 @@ public class CodeWriter {
                 throw new IllegalArgumentException("Illegal memory segment argument");
             }
         }
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeLabel(String[] labelCommand) throws IOException {
+        String writeCommand = "// " + labelCommand[0] + " " + labelCommand[1] + "\n";
+
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeGoTo(String[] goToCommand) throws IOException {
+        String writeCommand = "// " + goToCommand[0] + " " + goToCommand[1] + "\n";
+
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeIf(String[] ifCommand) throws IOException {
+        String writeCommand = "// " + ifCommand[0] + " " + ifCommand[1] + "\n";
+
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeFunction(String[] functionCommand) throws IOException {
+        String writeCommand = "// " + functionCommand[0] + " " + functionCommand[1] + " " + functionCommand[2] + "\n";
+
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeCall(String[] callCommand) throws IOException {
+        String writeCommand = "// " + callCommand[0] + " " + callCommand[1] + " " + callCommand[2] + "\n";
+
+        fw.write(writeCommand);
+
+        return writeCommand;
+    }
+
+    String writeReturn() throws IOException {
+        String writeCommand = "// return\n";
+
         fw.write(writeCommand);
 
         return writeCommand;

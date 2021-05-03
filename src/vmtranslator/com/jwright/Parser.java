@@ -105,7 +105,7 @@ public class Parser {
 				return Operation.C_LABEL.toString();
 			case "goto":
 				return Operation.C_GOTO.toString();
-			case "if":
+			case "if-goto":
 				return Operation.C_IF.toString();
 			case "function":
 				return Operation.C_FUNCTION.toString();

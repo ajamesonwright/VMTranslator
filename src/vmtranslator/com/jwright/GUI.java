@@ -94,8 +94,11 @@ public class GUI extends JPanel implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				// if a directory selected, step through files contained
 				if (fc.getSelectedFile().isDirectory()) {
+					String currentFileName;
 					String fileExt;
 					for (String s : fc.getSelectedFile().list()) {
+						currentFileName = fc.getSelectedFile().getAbsolutePath() + "\\" + s;
+						VMTranslator.triggerFileChange(currentFileName);
 
 						if (s.indexOf(".") >= 0) {
 							fileExt = s.substring(s.indexOf("."));
@@ -104,11 +107,9 @@ public class GUI extends JPanel implements ActionListener {
 							if (fileExt.equals(".vm")) {
 
 								// concat directory path with applicable filename
-								System.out.println(fc.getSelectedFile().getAbsolutePath() + "\\" + s);
 								file.add(new File(fc.getSelectedFile().getAbsolutePath() + "\\" + s));
 							}
 						}
-						
 					}
 					if (file.isEmpty()) {
 						logI.append("\n No .vm files contained in selected directory. Check sub-directories.\n");
