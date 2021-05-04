@@ -41,36 +41,42 @@ public class CodeWriter {
         String[] newLabel = new String[2];
         newLabel[0] = arg1;
         newLabel[1] = arg2;
+        outputQueue.add(newLabel);
     }
     
     void storeGoTo(String arg1, String arg2) {
         String[] newGoTo = new String[2];
         newGoTo[0] = arg1;
         newGoTo[1] = arg2;
+        outputQueue.add(newGoTo);
     }
 
     void storeIf(String arg1, String arg2) {
         String[] newIf = new String[2];
         newIf[0] = arg1;
         newIf[1] = arg2;
+        outputQueue.add(newIf);
     }
 
-    void storeFunction(String arg1, String arg2, String arg3) {
+    void storeFunction(String arg1, String arg2, int arg3) {
         String[] newFunction = new String[3];
         newFunction[0] = arg1;
         newFunction[1] = arg2;
-        newFunction[2] = arg3;
+        newFunction[2] = "" + arg3;
+        outputQueue.add(newFunction);
     }
 
-    void storeCall(String arg1, String arg2, String arg3) {
+    void storeCall(String arg1, String arg2, int arg3) {
         String[] newCall = new String[3];
         newCall[0] = arg1;
         newCall[1] = arg2;
-        newCall[2] = arg3;
+        newCall[2] = "" + arg3;
+        outputQueue.add(newCall);
     }
 
-    void storeReturn() {
-
+    void storeReturn(String arg1) {
+        String[] newReturn = new String[1];
+        newReturn[0] = arg1;
     }
 
     String writeArithmetic(String[] arithmeticCommand) throws IOException {
@@ -446,6 +452,7 @@ public class CodeWriter {
 
     String writeLabel(String[] labelCommand) throws IOException {
         String writeCommand = "// " + labelCommand[0] + " " + labelCommand[1] + "\n";
+        writeCommand += "(" + labelCommand[1] + ")\n";
 
         fw.write(writeCommand);
 
@@ -486,6 +493,58 @@ public class CodeWriter {
 
     String writeReturn() throws IOException {
         String writeCommand = "// return\n";
+        writeCommand += """
+        @LCL
+        D=M
+        @R12
+        M=D
+        @5
+        A=D-A
+        D=M
+        @R11
+        M=D
+        @ARG
+        D=M
+        @R13
+        M=D
+        @SP
+        AM=M-1
+        D=M
+        @R13
+        A=M
+        M=D
+        @ARG
+        D=M
+        @SP
+        M=D+1
+        @R12
+        D=M-1
+        AM=D
+        D=M
+        @THAT
+        M=D
+        @R12
+        D=M-1
+        AM=D
+        D=M
+        @THIS
+        M=D
+        @R12
+        D=M-1
+        AM=D
+        D=M
+        @ARG
+        M=D
+        @R12
+        D=M-1
+        AM=D
+        D=M
+        @LCL
+        M=D
+        @R11
+        A=M
+        0;JMP
+        """;
 
         fw.write(writeCommand);
 

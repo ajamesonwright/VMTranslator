@@ -69,7 +69,11 @@ public class VMTranslator {
 				argument2 = parser.arg2();
 				argument3 = parser.arg3();
 			}
+			if (argType == "C_LABEL" || argType == "C_GOTO" || argType == "C_IF") {
+				argument2 = parser.arg2();
+			}
 
+			// store each input command 
 			if (argType == "C_ARITHMETIC") {
 				codeWriter.storeArithmetic(parser.currentCommand);
 			}
@@ -78,6 +82,21 @@ public class VMTranslator {
 			}
 			if (argType == "C_LABEL") {
 				codeWriter.storeLabel(argument1, argument2);
+			}
+			if (argType == "C_GOTO") {
+				codeWriter.storeGoTo(argument1, argument2);
+			}
+			if (argType == "C_IF") {
+				codeWriter.storeIf(argument1, argument2);
+			}
+			if (argType == "C_FUNCTION") {
+				codeWriter.storeFunction(argument1, argument2, argument3);
+			}
+			if (argType == "C_CALL") {
+				codeWriter.storeCall(argument1, argument2, argument3);
+			}
+			if (argType == "C_RETURN") {
+				codeWriter.storeReturn("return");
 			}
 
 		}
@@ -101,14 +120,31 @@ public class VMTranslator {
 				gui.logO.setText("");
 				// step through all arrays stored in parsed list
 				for (String[] sa : codeWriter.outputQueue) {
-					// save arithmetic commands
-					if (sa.length == 1) {
+					if (sa.length == 1 && !sa[0].equals("return")) {
 						writerOutput = codeWriter.writeArithmetic(sa);
 					}
-					// save push/pop commands
-					if (sa.length == 3) {
+					else if (sa[0].equals("push") || sa[0].equals("pop")) {
 						writerOutput = codeWriter.writePushPop(sa);
 					}
+					else if (sa[0].equals("label")) {
+						writerOutput = codeWriter.writeLabel(sa);
+					}
+					else if (sa[0].equals("goto")) {
+						writerOutput = codeWriter.writeGoTo(sa);
+					}
+					else if (sa[0].equals("if-goto")) {
+						writerOutput = codeWriter.writeIf(sa);
+					}
+					else if (sa[0].equals("function")) {
+						writerOutput = codeWriter.writeFunction(sa);
+					}
+					else if (sa[0].equals("call")) {
+						writerOutput = codeWriter.writeCall(sa);
+					}
+					else {
+						writerOutput = codeWriter.writeReturn();
+					}
+
 					gui.logO.append(writerOutput);
 				}
 				codeWriter.closeFileWriter();
