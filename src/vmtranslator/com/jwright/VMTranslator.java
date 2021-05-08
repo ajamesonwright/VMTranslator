@@ -16,14 +16,14 @@ public class VMTranslator {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui = new GUI();
-
+				codeWriter = new CodeWriter();
 			}
 		});
 	}
 
 	static void openFile(File file) {
 		// create parser, open file, and store file contents
-		parser = new Parser(file);
+		parser = new Parser(file);		
 
 		// if file was opened successfully, append each line to display in input log pane
 		if (parser.fileOpenErrorMessage ==  null) {
@@ -38,8 +38,6 @@ public class VMTranslator {
 	static void triggerParser() {
 		String argType, argument1, argument2;
 		int argument3;
-
-		codeWriter = new CodeWriter();
 
 		while (parser.hasMoreCommands()) {
 			argType = "";
@@ -104,59 +102,91 @@ public class VMTranslator {
 	}
 
 	static void triggerCodeWriter(List<File> fileIn) {
-		for (File f : fileIn) {
-			// extract destination file name
-			String fileInName = f.getPath();
-			// exchange .vm extension for .asm extension
-			String fileOutName = fileInName.substring(0, fileInName.indexOf(".")) + ".asm";
-			
-			try {
-				// create new file for parsed output
-				File outputFile = new File(fileOutName);
-				outputFile.createNewFile();
-				codeWriter.fw = new FileWriter(outputFile);
-	
-				String writerOutput = "";
-				gui.logO.setText("");
-				// step through all arrays stored in parsed list
-				for (String[] sa : codeWriter.outputQueue) {
-					if (sa.length == 1 && !sa[0].equals("return")) {
-						writerOutput = codeWriter.writeArithmetic(sa);
-					}
-					else if (sa[0].equals("push") || sa[0].equals("pop")) {
-						writerOutput = codeWriter.writePushPop(sa);
-					}
-					else if (sa[0].equals("label")) {
-						writerOutput = codeWriter.writeLabel(sa);
-					}
-					else if (sa[0].equals("goto")) {
-						writerOutput = codeWriter.writeGoTo(sa);
-					}
-					else if (sa[0].equals("if-goto")) {
-						writerOutput = codeWriter.writeIf(sa);
-					}
-					else if (sa[0].equals("function")) {
-						writerOutput = codeWriter.writeFunction(sa);
-					}
-					else if (sa[0].equals("call")) {
-						writerOutput = codeWriter.writeCall(sa);
-					}
-					else {
-						writerOutput = codeWriter.writeReturn();
-					}
+		String fileOutName;
 
-					gui.logO.append(writerOutput);
-				}
-				codeWriter.closeFileWriter();
-			}
-			catch (IOException e) {
-				System.out.println(e.toString());
-			}
+		gui.logO.setText("");
+
+		// exchange .vm extension for .asm extension and if a directory was selected for parsing, combine output of codeWriter into a
+		// single file named for the directory
+		if (fileIn.size() > 1) {
+			fileOutName = fileIn.get(0).getAbsolutePath();
+
+			// select directory path
+			int delimiterOfInterest = fileOutName.lastIndexOf(("\\"));
+			fileOutName = fileOutName.substring(0, delimiterOfInterest);
+
+			// identify name of lowest level directory
+			String lowestDirectoryName = fileOutName.substring(fileOutName.lastIndexOf("\\") + 1);
+
+			// add lowest level directory as name of .asm file to be output
+			fileOutName = fileOutName.substring(0, delimiterOfInterest) + "\\" + lowestDirectoryName + ".asm";
 		}
-		
+		else {
+			String fileInName = fileIn.get(0).getAbsolutePath();
+			fileOutName = fileInName.substring(0, fileInName.indexOf(".")) + ".asm";
+		}
+
+		try {
+			// create new file for parsed output
+			File outputFile = new File(fileOutName);
+			outputFile.createNewFile();
+			codeWriter.fw = new FileWriter(outputFile);
+
+			String writerOutput = "";
+
+			// write init function
+			if (fileIn.size() > 1) {
+				writerOutput = codeWriter.writeInit();
+				codeWriter.fw.write(writerOutput);
+				gui.logO.append(writerOutput);
+			}
+
+			for (String[] sa : codeWriter.outputQueue) {
+				for (String s : sa) {
+					System.out.print(s + " ");
+				}
+				System.out.print("\n");
+			}
+
+			// step through all arrays stored in parsed list
+			for (String[] sa : codeWriter.outputQueue) {
+				if (sa.length == 1 && !sa[0].equals("return")) {
+					writerOutput = codeWriter.writeArithmetic(sa);
+				}
+				else if (sa[0].equals("push") || sa[0].equals("pop")) {
+					writerOutput = codeWriter.writePushPop(sa);
+				}
+				else if (sa[0].equals("label")) {
+					writerOutput = codeWriter.writeLabel(sa);
+				}
+				else if (sa[0].equals("goto")) {
+					writerOutput = codeWriter.writeGoTo(sa);
+				}
+				else if (sa[0].equals("if-goto")) {
+					writerOutput = codeWriter.writeIf(sa);
+				}
+				else if (sa[0].equals("function")) {
+					writerOutput = codeWriter.writeFunction(sa);
+				}
+				else if (sa[0].equals("call")) {
+					writerOutput = codeWriter.writeCall(sa);
+				}
+				else if (sa[0].equals("return")) {
+					System.out.println("return writing");
+					writerOutput = codeWriter.writeReturn();
+				}
+
+				codeWriter.fw.write(writerOutput);
+				gui.logO.append(writerOutput);
+			}
+			codeWriter.closeFileWriter();
+		}
+		catch (IOException e) {
+			System.out.println(e.toString());
+		}
 	}
 
-	static void triggerFileChange(String fileName) {
-		codeWriter.setFileName(fileName);
+	static void triggerFileChange(File file) {
+		codeWriter.setFileName(file);
 	}
 }

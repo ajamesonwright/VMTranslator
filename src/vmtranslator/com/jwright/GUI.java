@@ -98,7 +98,7 @@ public class GUI extends JPanel implements ActionListener {
 					String fileExt;
 					for (String s : fc.getSelectedFile().list()) {
 						currentFileName = fc.getSelectedFile().getAbsolutePath() + "\\" + s;
-						VMTranslator.triggerFileChange(currentFileName);
+						VMTranslator.triggerFileChange(new File(currentFileName));
 
 						if (s.indexOf(".") >= 0) {
 							fileExt = s.substring(s.indexOf("."));
