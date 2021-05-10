@@ -5,6 +5,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -12,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
 public class GUI extends JPanel implements ActionListener {
@@ -22,14 +25,14 @@ public class GUI extends JPanel implements ActionListener {
 	JButton openButton, saveButton, parseButton;
 	JFileChooser fc;
 	File activeDirectory;
-	File file;
+	List<File> file;
 		
 	public GUI() {
 		super(new BorderLayout());
 		
 		// main window for user interaction
 		frame = new JFrame();
-		frame.setSize(400,400);
+		frame.setSize(1000,1000);
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
 		// set title for main window
@@ -39,19 +42,24 @@ public class GUI extends JPanel implements ActionListener {
 		buttonPanel = new JPanel();
 		
 		// log to display input file, unedited
-		logI = new JTextArea(30, 30);
+		logI = new JTextArea(50, 50);
 		logI.setMargin(new Insets(5,5,5,5));
 		logI.setEditable(false);
 		logScrollPaneI = new JScrollPane(logI);
 		// log to display parsed file information
-		logO = new JTextArea(30, 30);
+		logO = new JTextArea(50, 50);
 		logO.setMargin(new Insets(5,5,5,5));
 		logO.setEditable(false);
 		logScrollPaneO = new JScrollPane(logO);
 
+		// set file chooser and allow selection of file or directory
 		fc = new JFileChooser();
-		activeDirectory = new File("C:\\Users\\Jamie\\nand2tetris\\projects\\07");
+		activeDirectory = new File("C:\\Users\\Jameson\\Nand to Tetris\\nand2tetris\\projects\\08");
 		fc.setCurrentDirectory(activeDirectory);
+		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		// set filter for .vm files only
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("VM Files", "vm");
+		fc.setFileFilter(filter);
 		
 		openButton = new JButton("Load file...");
 		openButton.addActionListener(this);
@@ -71,6 +79,7 @@ public class GUI extends JPanel implements ActionListener {
 		// display the window
 		frame.pack();
 		frame.setVisible(true);
+		
 	}
 
 	@Override
@@ -80,13 +89,45 @@ public class GUI extends JPanel implements ActionListener {
 			logI.setText("");
 			logO.setText("");
 			int returnVal = fc.showOpenDialog(GUI.this);
+			file = new ArrayList<File>();
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				// if a directory selected, step through files contained
+				if (fc.getSelectedFile().isDirectory()) {
+					String currentFileName;
+					String fileExt;
+					for (String s : fc.getSelectedFile().list()) {
+						currentFileName = fc.getSelectedFile().getAbsolutePath() + "\\" + s;
+
+						if (s.indexOf(".") >= 0) {
+							fileExt = s.substring(s.indexOf("."));
+							
+							// check file extension to verify it is of type .vm
+							if (fileExt.equals(".vm")) {
+								/*
+								// trigger codewriter file change
+								VMTranslator.triggerFileChange(new File(currentFileName));
+								*/
+
+								// build list of applicable files
+								file.add(new File(currentFileName));
+							}
+						}
+					}
+					if (file.isEmpty()) {
+						logI.append("\n No .vm files contained in selected directory. Check sub-directories.\n");
+					}
+				}
 				// if a file selected, attempt to parse
-				file = fc.getSelectedFile();
-				
-				logI.append("Opening" + " " + file.getName() + "\n\n");			
-				VMTranslator.openFile(file);					
+				else {
+					file.add(fc.getSelectedFile());
+				}
+
+				for (File f : file) {
+					logI.append("\n*** Opening" + " " + f.getName() + " ***\n\n");	
+					VMTranslator.openFile(f);					
+				}
+						
 			}
 			// if cancelled, append message to scroll pane
 			else {
@@ -98,8 +139,11 @@ public class GUI extends JPanel implements ActionListener {
 
 			// check logI for contents, parse file if found
 			if (logI.getText().trim().length() > 0) {
-				logO.append("Parsing" + " " + file.getName() + "...\n\n");
-				VMTranslator.triggerParser();
+				for (File f : file) {
+					logO.append("Parsing" + " " + f.getName() + "...\n\n");
+					VMTranslator.triggerParser(f);
+				}
+
 			}
 		}
 		if (e.getSource() == saveButton) {
