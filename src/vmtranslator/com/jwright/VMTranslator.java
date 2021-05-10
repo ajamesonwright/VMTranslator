@@ -11,6 +11,7 @@ public class VMTranslator {
 	static GUI gui;
 	static Parser parser;
 	static CodeWriter codeWriter;
+	static List<List<String>> inputQueue;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -31,13 +32,15 @@ public class VMTranslator {
 				gui.logI.append(parser.fileReader.nextLine() + "\n");
 			}
 		}
-
-		parser = new Parser(file);
 	}
 
-	static void triggerParser() {
+	static void triggerParser(File file) {
 		String argType, argument1, argument2;
 		int argument3;
+
+		parser = new Parser(file);
+
+		codeWriter.outputQueue.add(new String[]{"// FILE CHANGE : ", file.getName()});
 
 		while (parser.hasMoreCommands()) {
 			argType = "";
@@ -127,7 +130,7 @@ public class VMTranslator {
 		}
 
 		try {
-			// create new file for parsed output
+			// create new file and filewriter for parsed output
 			File outputFile = new File(fileOutName);
 			outputFile.createNewFile();
 			codeWriter.fw = new FileWriter(outputFile);
@@ -141,15 +144,11 @@ public class VMTranslator {
 				gui.logO.append(writerOutput);
 			}
 
-			for (String[] sa : codeWriter.outputQueue) {
-				for (String s : sa) {
-					System.out.print(s + " ");
-				}
-				System.out.print("\n");
-			}
-
 			// step through all arrays stored in parsed list
 			for (String[] sa : codeWriter.outputQueue) {
+				if (sa[0].equals("// FILE CHANGE : ")) {
+					triggerFileChange(new File(sa[1]));
+				}
 				if (sa.length == 1 && !sa[0].equals("return")) {
 					writerOutput = codeWriter.writeArithmetic(sa);
 				}
@@ -172,7 +171,6 @@ public class VMTranslator {
 					writerOutput = codeWriter.writeCall(sa);
 				}
 				else if (sa[0].equals("return")) {
-					System.out.println("return writing");
 					writerOutput = codeWriter.writeReturn();
 				}
 

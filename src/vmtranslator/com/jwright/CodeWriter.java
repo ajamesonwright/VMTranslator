@@ -21,7 +21,7 @@ public class CodeWriter {
     }
     
     void setFileName(File fileIn) {
-        fileName = fileIn.getName();
+        fileName = fileIn.getName().substring(0, fileIn.getName().indexOf("."));
     }
 
     void storeArithmetic(String currentCommand) {
@@ -402,7 +402,7 @@ public class CodeWriter {
                 throw new IllegalArgumentException("Illegal pop destination");
             }
             else if (pushPopCommand[1].equals("static")) {
-                writeCommand += "@" + fileName + "." + target + """
+                writeCommand += "@" + fileName + "." + target + "\n" + """
                 D=A
                 @R13
                 M=D
@@ -494,7 +494,6 @@ public class CodeWriter {
 
         for (int i = 0; i < Integer.parseInt(functionCommand[2]); i++) {
             writeCommand += writePushPop(new String[]{"push", "constant", "0"});
-            System.out.println(writeCommand);
         }
 
         return writeCommand;

@@ -98,16 +98,19 @@ public class GUI extends JPanel implements ActionListener {
 					String fileExt;
 					for (String s : fc.getSelectedFile().list()) {
 						currentFileName = fc.getSelectedFile().getAbsolutePath() + "\\" + s;
-						VMTranslator.triggerFileChange(new File(currentFileName));
 
 						if (s.indexOf(".") >= 0) {
 							fileExt = s.substring(s.indexOf("."));
 							
 							// check file extension to verify it is of type .vm
 							if (fileExt.equals(".vm")) {
+								/*
+								// trigger codewriter file change
+								VMTranslator.triggerFileChange(new File(currentFileName));
+								*/
 
-								// concat directory path with applicable filename
-								file.add(new File(fc.getSelectedFile().getAbsolutePath() + "\\" + s));
+								// build list of applicable files
+								file.add(new File(currentFileName));
 							}
 						}
 					}
@@ -138,8 +141,9 @@ public class GUI extends JPanel implements ActionListener {
 			if (logI.getText().trim().length() > 0) {
 				for (File f : file) {
 					logO.append("Parsing" + " " + f.getName() + "...\n\n");
+					VMTranslator.triggerParser(f);
 				}
-				VMTranslator.triggerParser();
+
 			}
 		}
 		if (e.getSource() == saveButton) {
